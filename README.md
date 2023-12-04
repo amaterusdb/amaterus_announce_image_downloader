@@ -14,8 +14,8 @@ poetry run python -m amaterus_announce_image_downloader
 mkdir -p "./work"
 sudo chown -R "1000:1000" "./work"
 
-sudo docker build -t amaterus_announce_image_downloader .
-sudo docker run --rm --env-file ./.env -v "./work:/code/amaterus_announce_image_downloader/work" amaterus_announce_image_downloader
+sudo docker build -t docker.aoirint.com/aoirint/amaterus_announce_image_downloader .
+sudo docker run --rm --env-file ./.env -v "./work:/code/amaterus_announce_image_downloader/work" docker.aoirint.com/aoirint/amaterus_announce_image_downloader
 ```
 
 ## Dependency management
