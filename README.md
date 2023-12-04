@@ -11,8 +11,8 @@ poetry run python -m amaterus_announce_image_downloader
 ### Docker usage
 
 ```shell
-docker build -t amaterus_announce_image_downloader .
-docker run --rm amaterus_announce_image_downloader
+sudo docker build -t amaterus_announce_image_downloader .
+sudo docker run --rm -env-file ./.env amaterus_announce_image_downloader
 ```
 
 ## Dependency management
