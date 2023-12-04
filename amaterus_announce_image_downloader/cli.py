@@ -1,8 +1,10 @@
+import logging
 import os
 import time
 import traceback
 from argparse import ArgumentParser
 from datetime import datetime
+from logging import Logger, getLogger
 from pathlib import Path
 from urllib.parse import urljoin
 from zoneinfo import ZoneInfo
@@ -71,6 +73,7 @@ def crawl(
     internal_useragent: str,
     external_useragent: str,
     output_dir: Path,
+    logger: Logger,
 ) -> None:
     twitter_tweet_images = fetch_twitter_tweet_images(
         amaterus_hasura_url=amaterus_hasura_url,
@@ -93,6 +96,9 @@ def crawl(
         fetched_at = datetime.now().astimezone(tz=JST)
 
         try:
+            logger.info(
+                f"[id={twitter_tweet_image.id}] Send request to {twitter_tweet_image.url}"
+            )
             res = httpx.get(
                 url=twitter_tweet_image.url,
                 headers={
@@ -199,9 +205,15 @@ def main() -> None:
     external_useragent: str = args.external_useragent
     output_dir: Path = args.output_dir
 
+    logging.basicConfig(
+        level=logging.INFO,
+    )
+    logger = getLogger()
+
     crawl(
         amaterus_hasura_url=amaterus_hasura_url,
         internal_useragent=internal_useragent,
         external_useragent=external_useragent,
         output_dir=output_dir,
+        logger=logger,
     )
