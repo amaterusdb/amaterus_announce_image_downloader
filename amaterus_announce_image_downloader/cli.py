@@ -13,6 +13,9 @@ import httpx
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
+from . import __VERSION__ as APP_VERSION
+
+
 JST = ZoneInfo("Asia/Tokyo")
 
 
@@ -197,6 +200,11 @@ def main() -> None:
         default=ENV_APP_OUTPUT_DIR,
         required=ENV_APP_OUTPUT_DIR is None,
         help="Output directory",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=APP_VERSION,
     )
     args = parser.parse_args()
 
