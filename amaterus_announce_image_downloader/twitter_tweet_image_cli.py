@@ -206,8 +206,7 @@ def add_twitter_tweet_image_arguments(
     parser.add_argument(
         "--output_dir",
         type=Path,
-        default=app_config.output_dir,
-        required=app_config.output_dir is None,
+        required=True,
         help="Output directory",
     )
     parser.set_defaults(
