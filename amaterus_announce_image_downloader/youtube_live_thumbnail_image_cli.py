@@ -24,11 +24,11 @@ class FetchYoutubeLiveResponseData(BaseModel):
     youtube_lives: list[YoutubeLive]
 
 
-class FetchYoutubeLivesResponse(BaseModel):
+class FetchYoutubeLiveResponse(BaseModel):
     data: FetchYoutubeLiveResponseData
 
 
-def fetch_youtube_live_thumbnail_images(
+def fetch_youtube_lives(
     amaterus_hasura_url: str,
     internal_useragent: str,
 ) -> list[YoutubeLive]:
@@ -55,7 +55,7 @@ query GetYoutubeLives {
     )
     raw_response.raise_for_status()
 
-    response = FetchYoutubeLivesResponse.model_validate(raw_response.json())
+    response = FetchYoutubeLiveResponse.model_validate(raw_response.json())
     return response.data.youtube_lives
 
 
@@ -74,7 +74,7 @@ def crawl_youtube_live_thumbnail_images(
     output_dir: Path,
     logger: Logger,
 ) -> None:
-    youtube_lives = fetch_youtube_live_thumbnail_images(
+    youtube_lives = fetch_youtube_lives(
         amaterus_hasura_url=amaterus_hasura_url,
         internal_useragent=internal_useragent,
     )
