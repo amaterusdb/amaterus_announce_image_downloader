@@ -67,7 +67,7 @@ class TwitterTweetImageMetadata(BaseModel):
     fetched_at: datetime
 
 
-def crawl(
+def crawl_twitter_tweet_images(
     amaterus_hasura_url: str,
     internal_useragent: str,
     external_useragent: str,
@@ -169,7 +169,7 @@ def twitter_tweet_image_command(
     external_useragent: str = args.external_useragent
     output_dir: Path = args.output_dir
 
-    crawl(
+    crawl_twitter_tweet_images(
         amaterus_hasura_url=amaterus_hasura_url,
         internal_useragent=internal_useragent,
         external_useragent=external_useragent,
