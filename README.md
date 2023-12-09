@@ -8,6 +8,8 @@ poetry install
 poetry run python -m amaterus_announce_image_downloader twitter_tweet_image --output_dir "work/twitter_tweet_images/"
 
 poetry run python -m amaterus_announce_image_downloader youtube_live_thumbnail_image --output_dir "work/youtube_live_thumbnail_images/"
+
+poetry run python -m amaterus_announce_image_downloader youtube_video_thumbnail_image --output_dir "work/youtube_video_thumbnail_images/"
 ```
 
 ### Docker usage
