@@ -71,6 +71,7 @@ def crawl_youtube_video_thumbnail_images(
     amaterus_hasura_url: str,
     internal_useragent: str,
     external_useragent: str,
+    variant: str,
     output_dir: Path,
     logger: Logger,
 ) -> None:
@@ -97,7 +98,7 @@ def crawl_youtube_video_thumbnail_images(
         try:
             thumbnail_image_url = (
                 f"https://i.ytimg.com/vi/{youtube_video.remote_youtube_video_id}/"
-                "maxresdefault.jpg"
+                f"{variant}.jpg"
             )
 
             logger.info(
@@ -172,12 +173,14 @@ def youtube_video_thumbnail_image_command(
     amaterus_hasura_url: str = args.amaterus_hasura_url
     internal_useragent: str = args.internal_useragent
     external_useragent: str = args.external_useragent
+    variant: str = args.variant
     output_dir: Path = args.output_dir
 
     crawl_youtube_video_thumbnail_images(
         amaterus_hasura_url=amaterus_hasura_url,
         internal_useragent=internal_useragent,
         external_useragent=external_useragent,
+        variant=variant,
         output_dir=output_dir,
         logger=logger,
     )
@@ -207,6 +210,12 @@ def add_youtube_video_thumbnail_image_arguments(
         default=app_config.external_useragent,
         required=app_config.external_useragent is None,
         help="Useragent for external HTTP request (YouTube)",
+    )
+    parser.add_argument(
+        "--variant",
+        type=str,
+        required=True,
+        help="Thumbnail variant (e.g. maxresdefault, hqdefault)",
     )
     parser.add_argument(
         "--output_dir",
