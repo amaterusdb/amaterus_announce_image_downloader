@@ -53,8 +53,10 @@ def main() -> None:
 
     logging.basicConfig(
         level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s : %(message)s",
     )
-    logger = getLogger()
+
+    logger = getLogger(__name__)
 
     if hasattr(args, "handler"):
         args.handler(args, logger)
