@@ -96,7 +96,8 @@ def crawl_twitter_tweet_images(
 
         try:
             logger.info(
-                f"[id={twitter_tweet_image.id}] Send request to {twitter_tweet_image.url}"
+                f"[id={twitter_tweet_image.id}] "
+                f"Send request to {twitter_tweet_image.url}"
             )
             res = httpx.get(
                 url=twitter_tweet_image.url,
