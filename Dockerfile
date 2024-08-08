@@ -7,26 +7,15 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV PATH=/root/.local/bin:${PATH}
 
-ARG PIPX_VERSION=1.6.0
-RUN --mount=type=cache,target=/root/.cache/pip <<EOF
-    set -eu
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install pipx
 
-    pip install "pipx==${PIPX_VERSION}"
-EOF
-
-ARG POETRY_VERSION=1.8.3
-RUN --mount=type=cache,target=/root/.cache/pipx <<EOF
-    set -eu
-
-    pipx install "poetry==${POETRY_VERSION}"
-EOF
+RUN --mount=type=cache,target=/root/.cache/pipx \
+    pipx install poetry
 
 RUN --mount=type=cache,target=/root/.cache/pypoetry/cache \
-    --mount=type=cache,target=/root/.cache/pypoetry/artifacts <<EOF
-    set -eu
-
+    --mount=type=cache,target=/root/.cache/pypoetry/artifacts \
     poetry self add poetry-plugin-export
-EOF
 
 COPY ./pyproject.toml ./poetry.lock /opt/poetry-export/
 
@@ -39,7 +28,8 @@ FROM ${BASE_IMAGE} AS runtime-stage
 ENV PYTHONUNBUFFERED=1
 
 COPY --from=poetry-export-stage /opt/poetry-export/requirements.txt /opt/poetry-export/
-RUN --mount=type=cache,target=/root/.cache/pip pip install -r /opt/poetry-export/requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r /opt/poetry-export/requirements.txt
 
 COPY ./pyproject.toml ./README.md /opt/amaterus_announce_image_downloader/
 COPY ./amaterus_announce_image_downloader /opt/amaterus_announce_image_downloader/amaterus_announce_image_downloader
