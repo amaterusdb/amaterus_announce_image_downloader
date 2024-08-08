@@ -15,7 +15,7 @@ select = [
 
 [tool.poetry]
 name = "amaterus-announce-image-downloader"
-version = "0.1.0"
+version = "0.0.0"
 description = ""
 authors = ["aoirint <aoirint@gmail.com>"]
 readme = "README.md"
