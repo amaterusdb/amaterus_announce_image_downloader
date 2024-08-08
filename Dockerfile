@@ -40,15 +40,10 @@ ENV PYTHONUNBUFFERED=1
 
 COPY --from=poetry-export-stage /opt/poetry-export /opt/poetry-export
 
-RUN --mount=type=cache,target=/root/.cache/pip <<EOF
-    set -eu
-
-    python -m venv /opt/python
-    source /opt/python/bin/activate
-
-    pip install -r /opt/poetry-export/requirements.txt
-EOF
+RUN python -m venv /opt/python
 ENV PATH=/opt/python/bin:${PATH}
+
+RUN --mount=type=cache,target=/root/.cache/pip pip install -r /opt/poetry-export/requirements.txt
 
 COPY ./pyproject.toml ./README.md /opt/amaterus_announce_image_downloader/
 COPY ./amaterus_announce_image_downloader /opt/amaterus_announce_image_downloader/amaterus_announce_image_downloader
