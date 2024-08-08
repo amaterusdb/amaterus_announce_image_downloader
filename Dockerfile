@@ -38,8 +38,7 @@ FROM ${BASE_IMAGE} AS runtime-stage
 
 ENV PYTHONUNBUFFERED=1
 
-COPY --from=poetry-export-stage /opt/poetry-export /opt/poetry-export
-
+COPY --from=poetry-export-stage /opt/poetry-export/requirements.txt /opt/poetry-export/
 RUN --mount=type=cache,target=/root/.cache/pip pip install -r /opt/poetry-export/requirements.txt
 
 COPY ./pyproject.toml ./README.md /opt/amaterus_announce_image_downloader/
