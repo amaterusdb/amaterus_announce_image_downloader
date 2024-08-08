@@ -4,7 +4,7 @@ from logging import getLogger
 
 from dotenv import load_dotenv
 
-from . import __VERSION__ as APP_VERSION
+from . import __version__ as APP_VERSION
 from .app_config import load_app_config_from_env
 from .twitter_tweet_image_cli import add_twitter_tweet_image_arguments
 from .youtube_live_thumbnail_image_cli import add_youtube_live_thumbnail_image_arguments
