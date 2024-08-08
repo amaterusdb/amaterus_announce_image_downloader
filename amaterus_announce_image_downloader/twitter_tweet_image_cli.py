@@ -5,10 +5,10 @@ from datetime import datetime
 from logging import Logger
 from pathlib import Path
 from urllib.parse import urljoin
-from zoneinfo import ZoneInfo
 
 import httpx
 from pydantic import BaseModel
+from zoneinfo import ZoneInfo
 
 from .app_config import AppConfig
 
@@ -96,7 +96,8 @@ def crawl_twitter_tweet_images(
 
         try:
             logger.info(
-                f"[id={twitter_tweet_image.id}] Send request to {twitter_tweet_image.url}"
+                f"[id={twitter_tweet_image.id}] "
+                f"Send request to {twitter_tweet_image.url}"
             )
             res = httpx.get(
                 url=twitter_tweet_image.url,
