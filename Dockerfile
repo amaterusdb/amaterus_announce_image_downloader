@@ -47,12 +47,12 @@ RUN --mount=type=cache,target=/root/.cache/pip <<EOF
     pip install -r /opt/poetry-export/requirements.txt
 EOF
 
+RUN python -m venv /opt/python
+ENV PATH=/opt/python/bin:${PATH}
+
 COPY ./pyproject.toml ./README.md /opt/amaterus_announce_image_downloader/
 COPY ./amaterus_announce_image_downloader /opt/amaterus_announce_image_downloader/amaterus_announce_image_downloader
 
-RUN python -m venv /opt/python
-
-ENV PATH=/opt/python/bin:${PATH}
 RUN python -m compileall /opt/amaterus_announce_image_downloader
 RUN pip install --no-deps --editable /opt/amaterus_announce_image_downloader
 
