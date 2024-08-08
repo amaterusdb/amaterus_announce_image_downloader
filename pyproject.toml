@@ -1,5 +1,5 @@
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
 line-length = 88
 
 [tool.ruff.lint]
@@ -21,7 +21,7 @@ authors = ["aoirint <aoirint@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "~3.11"
+python = "~3.12"
 httpx = "^0.25.2"
 python-dotenv = "^1.0.0"
 pydantic = "^2.5.2"

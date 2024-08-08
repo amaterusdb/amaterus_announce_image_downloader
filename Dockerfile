@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.9
-ARG BASE_IMAGE=python:3.11
+ARG BASE_IMAGE=python:3.12
 
 FROM ${BASE_IMAGE} AS poetry-export-stage
 
