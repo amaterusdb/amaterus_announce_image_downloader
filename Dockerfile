@@ -44,6 +44,8 @@ RUN --mount=type=cache,target=/root/.cache/pip <<EOF
     set -eu
 
     python -m venv /opt/python
+    source /opt/python/bin/activate
+
     pip install -r /opt/poetry-export/requirements.txt
 EOF
 ENV PATH=/opt/python/bin:${PATH}
