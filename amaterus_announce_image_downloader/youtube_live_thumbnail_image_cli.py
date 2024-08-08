@@ -5,10 +5,10 @@ from datetime import datetime
 from logging import Logger
 from pathlib import Path
 from urllib.parse import urljoin
+from zoneinfo import ZoneInfo
 
 import httpx
 from pydantic import BaseModel
-from zoneinfo import ZoneInfo
 
 from .app_config import AppConfig
 
