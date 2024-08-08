@@ -1,46 +1,60 @@
 # syntax=docker/dockerfile:1.9
-FROM python:3.11
+ARG BASE_IMAGE=python:3.11
+
+FROM ${BASE_IMAGE} AS poetry-export-stage
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG PIP_NO_CACHE_DIR=1
 ENV PYTHONUNBUFFERED=1
-ENV PATH=/home/user/.local/bin:${PATH}
+ENV PATH=/root/.local/bin:${PATH}
 
-RUN <<EOF
+ARG PIPX_VERSION=1.6.0
+RUN --mount=type=cache,target=/root/.cache/pip <<EOF
     set -eu
 
-    apt-get update
-
-    apt-get install -y \
-        gosu
-
-    apt-get clean
-    rm -rf /var/lib/apt/lists/*
-EOF
-
-RUN <<EOF
-    set -eu
-
-    groupadd -o -g 1000 user
-    useradd -m -o -u 1000 -g user user
+    pip install "pipx==${PIPX_VERSION}"
 EOF
 
 ARG POETRY_VERSION=1.8.3
-RUN <<EOF
+RUN --mount=type=cache,target=/root/.cache/pipx <<EOF
     set -eu
 
-    gosu user pip install "poetry==${POETRY_VERSION}"
+    pipx install "poetry==${POETRY_VERSION}"
 EOF
 
-ADD ./pyproject.toml ./poetry.lock /code/
-RUN <<EOF
+RUN --mount=type=cache,target=/root/.cache/pypoetry/cache \
+    --mount=type=cache,target=/root/.cache/pypoetry/artifacts <<EOF
     set -eu
 
-    cd /code
-    gosu user poetry install --only main
+    poetry self add poetry-plugin-export
 EOF
 
-ADD ./amaterus_announce_image_downloader /code/amaterus_announce_image_downloader
+COPY ./pyproject.toml ./poetry.lock /opt/poetry-export/
 
-WORKDIR /code
-ENTRYPOINT [ "gosu", "user", "poetry", "run", "python", "-m", "amaterus_announce_image_downloader" ]
+WORKDIR /opt/poetry-export
+RUN poetry export -o /opt/poetry-export/requirements.txt
+
+
+FROM ${BASE_IMAGE} AS runtime-stage
+
+ENV PYTHONUNBUFFERED=1
+
+COPY --from=poetry-export-stage /opt/poetry-export /opt/poetry-export
+
+RUN --mount=type=cache,target=/root/.cache/pip <<EOF
+    set -eu
+
+    python -m venv /opt/python
+    pip install -r /opt/poetry-export/requirements.txt
+EOF
+
+COPY ./pyproject.toml ./README.md /opt/amaterus_announce_image_downloader/
+COPY ./amaterus_announce_image_downloader /opt/amaterus_announce_image_downloader/amaterus_announce_image_downloader
+
+RUN python -m venv /opt/python
+
+ENV PATH=/opt/python/bin:${PATH}
+RUN python -m compileall /opt/amaterus_announce_image_downloader
+RUN pip install --no-deps --editable /opt/amaterus_announce_image_downloader
+
+USER "1000:1000"
+ENTRYPOINT [ "python", "-m", "amaterus_announce_image_downloader" ]
