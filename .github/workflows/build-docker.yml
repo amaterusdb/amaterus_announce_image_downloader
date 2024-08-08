@@ -6,9 +6,6 @@ on:
       - 'main'
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - 'main'
   workflow_dispatch:
 
 permissions:
@@ -35,32 +32,37 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=ref,event=branch,suffix=-{{sha}}
-            type=ref,event=branch
-            type=ref,event=pr
             type=pep440,pattern={{version}}
             type=pep440,pattern={{major}}
             type=pep440,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Generate Docker build cache metadata
-        id: meta-buildcache
+      - name: Generate Docker build cache source metadata
+        id: meta-buildcache-source
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=ref,event=branch,suffix=-buildcache
-            type=ref,event=pr,suffix=-buildcache
+            type=raw,value=latest,suffix=-buildcache
+
+      - name: Generate Docker build cache destination metadata
+        id: meta-buildcache-destination
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest,suffix=-buildcache,enable={{is_default_branch}}
 
       - name: Generate Docker build cache metadata vars
         id: meta-buildcache-vars
         shell: bash
         env:
-          DOCKER_METADATA_BUILDCACHE_OUTPUT_JSON: ${{ steps.meta-buildcache.outputs.json }}
+          DOCKER_METADATA_BUILDCACHE_SOURCE_OUTPUT_JSON: ${{ steps.meta-buildcache-source.outputs.json }}
+          DOCKER_METADATA_BUILDCACHE_DESTINATION_OUTPUT_JSON: ${{ steps.meta-buildcache-destination.outputs.json }}
         run: |
           {
             echo "cache-from<<EOF"
-            for tag in $(jq -r '.tags[]' <<< "$DOCKER_METADATA_BUILDCACHE_OUTPUT_JSON"); do
+            for tag in $(jq -r '.tags[]' <<< "$DOCKER_METADATA_BUILDCACHE_SOURCE_OUTPUT_JSON"); do
               echo "type=registry,ref=${tag}"
             done
             echo "EOF"
@@ -68,7 +70,7 @@ jobs:
 
           {
             echo "cache-to<<EOF"
-            for tag in $(jq -r '.tags[]' <<< "$DOCKER_METADATA_BUILDCACHE_OUTPUT_JSON"); do
+            for tag in $(jq -r '.tags[]' <<< "$DOCKER_METADATA_BUILDCACHE_DESTINATION_OUTPUT_JSON"); do
               echo "type=registry,ref=${tag},mode=max"
             done
             echo "EOF"
