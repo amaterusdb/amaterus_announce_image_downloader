@@ -1,46 +1,41 @@
-# syntax=docker/dockerfile:1.6
-FROM python:3.11
+# syntax=docker/dockerfile:1.9
+ARG BASE_IMAGE=python:3.11
+
+FROM ${BASE_IMAGE} AS poetry-export-stage
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG PIP_NO_CACHE_DIR=1
 ENV PYTHONUNBUFFERED=1
-ENV PATH=/home/user/.local/bin:${PATH}
+ENV PATH=/root/.local/bin:${PATH}
 
-RUN <<EOF
-    set -eu
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install pipx
 
-    apt-get update
+RUN --mount=type=cache,target=/root/.cache/pipx \
+    pipx install poetry
 
-    apt-get install -y \
-        gosu
+RUN --mount=type=cache,target=/root/.cache/pypoetry/cache \
+    --mount=type=cache,target=/root/.cache/pypoetry/artifacts \
+    poetry self add poetry-plugin-export
 
-    apt-get clean
-    rm -rf /var/lib/apt/lists/*
-EOF
+COPY ./pyproject.toml ./poetry.lock /opt/poetry-export/
 
-RUN <<EOF
-    set -eu
+WORKDIR /opt/poetry-export
+RUN poetry export --only main --output /opt/poetry-export/requirements.txt
 
-    groupadd -o -g 1000 user
-    useradd -m -o -u 1000 -g user user
-EOF
 
-ARG POETRY_VERSION=1.7.1
-RUN <<EOF
-    set -eu
+FROM ${BASE_IMAGE} AS runtime-stage
 
-    gosu user pip install "poetry==${POETRY_VERSION}"
-EOF
+ENV PYTHONUNBUFFERED=1
 
-ADD ./pyproject.toml ./poetry.lock /code/
-RUN <<EOF
-    set -eu
+COPY --from=poetry-export-stage /opt/poetry-export/requirements.txt /opt/poetry-export/
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r /opt/poetry-export/requirements.txt
 
-    cd /code
-    gosu user poetry install --only main
-EOF
+COPY ./pyproject.toml ./README.md /opt/amaterus_announce_image_downloader/
+COPY ./amaterus_announce_image_downloader /opt/amaterus_announce_image_downloader/amaterus_announce_image_downloader
 
-ADD ./amaterus_announce_image_downloader /code/amaterus_announce_image_downloader
+RUN python -m compileall /opt/amaterus_announce_image_downloader
+RUN pip install --no-deps --editable /opt/amaterus_announce_image_downloader
 
-WORKDIR /code
-ENTRYPOINT [ "gosu", "user", "poetry", "run", "python", "-m", "amaterus_announce_image_downloader" ]
+USER "1000:1000"
+ENTRYPOINT [ "python", "-m", "amaterus_announce_image_downloader" ]
