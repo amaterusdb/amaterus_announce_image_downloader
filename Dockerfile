@@ -31,7 +31,7 @@ EOF
 COPY ./pyproject.toml ./poetry.lock /opt/poetry-export/
 
 WORKDIR /opt/poetry-export
-RUN poetry export -o /opt/poetry-export/requirements.txt
+RUN poetry export --only main --output /opt/poetry-export/requirements.txt
 
 
 FROM ${BASE_IMAGE} AS runtime-stage
