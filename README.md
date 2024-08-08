@@ -34,6 +34,8 @@ poetry add --group dev pytest
 ## Code format
 
 ```shell
-poetry run pysen run lint
-poetry run pysen run format
+poetry run poetry run ruff check --fix
+poetry run poetry run ruff format
+
+poetry run poetry run mypy .
 ```
